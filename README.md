@@ -18,7 +18,7 @@
 ## How to run
 1. Start MongoDB: `mongod`
 2. `npm install` || `yarn install`
-3. `npm start` || `yarn start`
+3. `npm run dev` || `yarn dev`
 
 ## Build the project:
 1. `npm run build` || `yarn build`
