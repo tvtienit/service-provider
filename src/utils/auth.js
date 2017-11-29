@@ -1,20 +1,20 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt-nodejs');
 
-const config = require('../config/config');
+const { cfg } = require('../config/app');
 
 exports.getTokenFromRequest = req => (
     req.headers.authorization
 );
 
 exports.createToken = payload => (
-    jwt.sign(payload, config.auth.secret, {
-        expiresIn: config.auth.expiresIn
+    jwt.sign(payload, cfg.JwtSecret, {
+        expiresIn: cfg.JwtExpired
     })
 );
 
 exports.verifyToken = (token) => (
-    jwt.verify(token, config.auth.secret)
+    jwt.verify(token, cfg.JwtSecret)
 );
 
 exports.encryptPassword = (password, callback) => {

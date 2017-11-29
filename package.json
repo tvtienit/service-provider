@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "nodemon --exec babel-node src\\server.js",
         "start:dev": "babel-node src\\server.js",
-        "start:production": "node src\\server.js",
+        "start:production": "NODE_ENV=production node src\\server.js",
         "test": "jest"
     },
     "repository": {},
@@ -20,6 +20,7 @@
         "bluebird": "^3.4.7",
         "body-parser": "^1.15.2",
         "cors": "^2.8.1",
+        "dotenv": "^4.0.0",
         "express": "^4.14.0",
         "graphql": "^0.8.0",
         "graphql-tools": "^0.8.1",

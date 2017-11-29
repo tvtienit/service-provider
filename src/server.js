@@ -4,10 +4,9 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const assert = require('assert');
 const { apolloExpress, graphiqlExpress } = require('apollo-server');
-
-const { server, client, database, admin } = require('./config/config');
 const { schema } = require('./graphql');
 const { getTokenFromRequest, verifyToken } = require('./utils/auth');
+const { cfg } = require('./config/app');
 
 import Permission from './constants/permission';
 import { createExpressContext } from 'apollo-resolvers';
@@ -15,14 +14,13 @@ import { formatError as apolloFormatError, createError } from 'apollo-errors';
 import { GraphQLError } from 'graphql';
 
 mongoose.Promise = global.Promise;
-mongoose.connect(`mongodb://${database.host}:${database.port}/${database.name}`, (err, db) => {
+mongoose.connect(`mongodb://${cfg.DBHost}:${cfg.DBPort}/${cfg.DBName}`, (err, db) => {
     assert.equal(null, err);
 });
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Connection error:'));
 db.once('open', () => console.log('MongoDB\'s connected'));
-
 const app = express();
 
 const UnknownError = createError('UnknownError', {
@@ -69,9 +67,7 @@ const isAuth = async(req) => {
                     req.permission = Permission.USER;
                 }
             }
-        } catch (err) {
-            throw new Error("Something wrong with token")
-        }
+        } catch (err) {}
     }
 
     req.next();
@@ -80,9 +76,22 @@ const isAuth = async(req) => {
 /**
  * Set up origin for cors
  */
-var corsOptions = { origin: `${client.host}/${client.port}` };
+const whitelist = cfg.CORsWhiteList.split(',');
 
-app.use(cors(corsOptions));
+var corsOptions = {
+    origin: function(origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+}
+
+if (process.env.NODE_ENV === 'production') {
+    app.use(cors(corsOptions));
+}
+
 app.use(isAuth);
 
 app.post('/graphql', bodyParser.json(), apolloExpress((request, response) => {
@@ -100,8 +109,15 @@ app.post('/graphql', bodyParser.json(), apolloExpress((request, response) => {
     };
 }));
 
-app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+if (process.env.NODE_ENV === 'development') {
+    app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+}
 
-app.listen(server.port, () => console.log(`Now browse to ${server.host}:${server.port}/graphiql`));
+app.get('*', function(req, res, next) {
+    if (req.url === '/graphiql' && process.env.NODE_ENV === 'development') return next();
+    res.status(404).end();
+});
+
+app.listen(cfg.AppPort, () => console.log(`Now browse to ${cfg.AppHost}:${cfg.AppPort}/graphiql`));
 
 module.exports = app;
