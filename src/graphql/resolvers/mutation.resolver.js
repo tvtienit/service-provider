@@ -126,7 +126,7 @@ const registerService = isAuthenticatedResolver.createResolver(
     async(_, { service }, { user }) => {
         const uObj = await userByObj(user.id);
         if (uObj.is_registered)
-            throw new Error('User has registered a service before');
+            throw new Error('Bạn đã đăng kí dịch vụ với chúng tôi');
 
         service.userId = user.id;
         registerHost(user.id);
@@ -148,8 +148,10 @@ mutations = {...mutations, addCategory };
 
 //region review
 const rate = isAuthenticatedResolver.createResolver(
-    (_, review, { user }) => {
-        params.userId = user.id;
+    async(_, { review }, { user }) => {
+        if (await model.Review.findOne({ userId: user.id }) != null)
+            throw new Error("Bạn đã cho ý kiến về địa điểm này");
+        review.userId = user.id;
         return model.Review.create(review);
     }
 );

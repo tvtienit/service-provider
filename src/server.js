@@ -62,7 +62,6 @@ const isAuth = async(req) => {
             if (req.user.exp < Math.floor(Date.now() / 1000)) { // Token has expired
                 req.user = null;
                 req.permission = Permission.GUEST;
-                console.log('token has expired');
             } else {
                 if (req.user.username == admin.username) {
                     req.permission = Permission.ADMIN;
@@ -71,7 +70,7 @@ const isAuth = async(req) => {
                 }
             }
         } catch (err) {
-            console.log(err);
+            throw new Error("Something wrong with token")
         }
     }
 
