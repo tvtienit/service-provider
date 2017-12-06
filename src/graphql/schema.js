@@ -5,7 +5,8 @@ const { resolvers } = require('./resolvers');
 const Schema = `
     schema {
         query: Query,
-        mutation: Mutation
+        mutation: Mutation,
+        subscription: Subscription
     }
 `;
 

@@ -1,5 +1,6 @@
 import { query } from './query.type';
 import { mutation } from './mutation.type';
+import { subscription } from './subscription.type';
 import _ from 'lodash';
 
 const rootType = `
@@ -51,4 +52,4 @@ const rootType = `
     }
 `;
 
-exports.RootType = rootType.concat(query, mutation);
+exports.RootType = rootType.concat(query, mutation, subscription);

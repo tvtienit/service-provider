@@ -73,22 +73,23 @@ const isAuth = async(req) => {
     req.next();
 }
 
-/**
- * Set up origin for cors
- */
-const whitelist = cfg.CORsWhiteList.split(',');
+if (process.env.NODE_ENV === 'development') {
+    app.use('*', cors());
+} else if (process.env.NODE_ENV === 'production') {
+    /**
+     * Set up origin for cors
+     */
+    const whitelist = cfg.CORsWhiteList.split(',');
 
-var corsOptions = {
-    origin: function(origin, callback) {
-        if (whitelist.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
+    var corsOptions = {
+        origin: function(origin, callback) {
+            if (whitelist.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
         }
     }
-}
-
-if (process.env.NODE_ENV === 'production') {
     app.use(cors(corsOptions));
 }
 
