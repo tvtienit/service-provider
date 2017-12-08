@@ -10,7 +10,8 @@ const rootType = `
         email: String,
         nickname: String,
         phone: String,
-        registered: Host
+        registration_date: String,
+        registered: Host,
         reviews: [Review]
     }
 
@@ -48,7 +49,8 @@ const rootType = `
         long: Float,
         price: Float,
         host: Host,
-        reviews: [Review]
+        reviews: [Review],
+        is_inspected: Boolean
     }
 `;
 

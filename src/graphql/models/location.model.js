@@ -35,6 +35,9 @@ const locationSchema = new Schema({
     },
     hostId: {
         type: String
+    },
+    is_inspected: {
+        type: Boolean
     }
 }, { collection: 'location', timestamps: true });
 

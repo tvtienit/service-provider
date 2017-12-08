@@ -7,7 +7,12 @@ const filters = {
         },
         reviews: (_) => {
             return model.Review.find({ userId: _._id }).exec();
-        }
+        },
+        registration_date: (_) => (
+            _.createdAt.toISOString()
+            .replace(/T/, ' ')
+            .replace(/\..+/, '')
+        )
     },
     Host: {
         location: (_) => {
@@ -31,7 +36,8 @@ const filters = {
         },
         reviews: (_) => {
             return model.Review.find({ locationId: _._id }).exec();
-        }
+        },
+        is_inspected: (_) => (!_.is_inspected) ? false : _.is_inspected
     }
 };
 

@@ -34,19 +34,26 @@ const register = isGuestResolver.createResolver(
             if (!args.user.email) {
                 return reject({
                     name: 'email.empty',
-                    message: 'Email is empty.'
+                    message: 'Email is required'
                 });
             } else if (!isEmail(args.user.email)) {
                 return reject({
                     name: 'email.invalid',
-                    message: 'You have to provide a valid email.'
+                    message: 'Invalid email. Please try again!'
                 });
             }
 
             if (!args.user.password) {
                 return reject({
                     name: 'password.empty',
-                    message: 'You have to provide a password.'
+                    message: 'Password is required'
+                });
+            }
+
+            if (!args.user.username) {
+                return reject({
+                    name: 'username.empty',
+                    message: 'Username is required'
                 });
             }
 
@@ -81,13 +88,13 @@ const login = isGuestResolver.createResolver(
             if (!args.username) {
                 return reject({
                     name: 'username.empty',
-                    message: 'Username is empty.'
+                    message: 'Username is required.'
                 });
             }
             if (!args.password) {
                 return reject({
                     name: 'password.empty',
-                    message: 'You have to provide a password.'
+                    message: 'Password is required'
                 });
             }
 
@@ -98,7 +105,7 @@ const login = isGuestResolver.createResolver(
                     if (!user) {
                         return reject({
                             name: 'user.not_found',
-                            message: 'Authentication failed. User not found.'
+                            message: 'Wrong Username. Please try again!'
                         });
                     }
 
@@ -107,7 +114,7 @@ const login = isGuestResolver.createResolver(
                         if (!isMatch) {
                             return reject({
                                 name: 'password.wrong',
-                                message: 'Wrong password.'
+                                message: 'Wrong password. Please try again!'
                             });
                         }
 
