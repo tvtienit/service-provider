@@ -1,4 +1,5 @@
 import * as model from '../models';
+import { verifyToken } from '../../utils/auth';
 
 let queries = {};
 
@@ -10,7 +11,12 @@ const users = () => {
 const firstByUsername = (root, params) => {
     return model.User.findOne({ username: params.username }).exec();
 };
-queries = {...queries, users, firstByUsername };
+
+const extract = async(root, params) => {
+    const extracted = await verifyToken(params.token);
+    return extracted.exp < Math.floor(Date.now() / 1000) ? { message: "expired" } : extracted;
+};
+queries = {...queries, users, firstByUsername, extract };
 //endregion
 
 //region category

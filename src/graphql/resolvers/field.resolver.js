@@ -1,6 +1,9 @@
 import * as model from '../models';
 
 const filters = {
+    Auth: {
+        _id: (_) => _.id
+    },
     User: {
         registered: (_) => {
             return model.Host.findOne({ userId: _._id }).exec();

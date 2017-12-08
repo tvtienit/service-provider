@@ -4,6 +4,12 @@ import { subscription } from './subscription.type';
 import _ from 'lodash';
 
 const rootType = `
+    type Auth {
+        _id: ID,
+        username: String,
+        message: String
+    }
+
     type User {
         _id: ID,
         username: String,
