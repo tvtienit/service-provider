@@ -25,6 +25,9 @@ const userSchema = new Schema({
     },
     is_registered: {
         type: Boolean
+    },
+    sub_locations: {
+        type: [String]
     }
 }, { collection: 'user', timestamps: true });
 

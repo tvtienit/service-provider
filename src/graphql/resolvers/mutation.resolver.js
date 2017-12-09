@@ -1,7 +1,10 @@
 import * as model from '../models';
+import lds from 'lodash';
 import { isGuestResolver } from './guest.resolver';
 import { isAdminResolver } from './admin.resolver';
 import { isAuthenticatedResolver } from './auth.resolver';
+import { pubsub } from './../../utils/pubsub';
+import { REQUEST_SERVICE } from './../../constants/trigger';
 
 const isEmail = require('validator/lib/isEmail');
 
@@ -19,12 +22,34 @@ const userByObj = (userId) => {
 };
 
 const registerHost = (userId) => {
-    return userModel.findOne({ _id: userId }, { new: true }).exec((err, user) => {
+    return model.User.findOne({ _id: userId }, { new: true }).exec((err, user) => {
         user.is_registered = true;
         user.save();
         return user;
     });
 };
+
+const subscribes = isAuthenticatedResolver.createResolver(
+    async(_, params, { user }) => {
+        const eSub = await model.Subscriber.findOne({ userId: user.id, locationId: params.locationId }).exec();
+        const eLoc = await model.Location.findOne({ _id: params.locationId }).exec();
+        if (eSub) {
+            throw new Error("You've subscribed this location before");
+        } else if (eLoc.hostId === user.id) {
+            throw new Error("Cannot subscribe location that you're hosting");
+        } else {
+            const nSub = await model.Subscriber.create({
+                userId: user.id,
+                locationId: params.locationId
+            });
+
+            pubsub.publish(REQUEST_SERVICE, { requestService: nSub });
+            return nSub;
+        }
+    }
+);
+
+mutations = {...mutations, subscribes };
 //endregion
 
 //region user

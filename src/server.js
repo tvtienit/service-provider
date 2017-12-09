@@ -11,7 +11,9 @@ const { cfg } = require('./config/app');
 import Permission from './constants/permission';
 import { createExpressContext } from 'apollo-resolvers';
 import { formatError as apolloFormatError, createError } from 'apollo-errors';
-import { GraphQLError } from 'graphql';
+import { GraphQLError, execute, subscribe } from 'graphql';
+import { createServer } from 'http';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 
 mongoose.Promise = global.Promise;
 mongoose.connect(`mongodb://${cfg.DBHost}:${cfg.DBPort}/${cfg.DBName}`, (err, db) => {
@@ -50,7 +52,6 @@ const formatError = error => {
  */
 const isAuth = async(req) => {
     const token = getTokenFromRequest(req);
-    //console.log(token);
     if (!token) {
         req.user = null;
         req.permission = Permission.GUEST;
@@ -61,13 +62,15 @@ const isAuth = async(req) => {
                 req.user = null;
                 req.permission = Permission.GUEST;
             } else {
-                if (req.user.username == admin.username) {
+                if (req.user.username == 'admin') {
                     req.permission = Permission.ADMIN;
                 } else {
                     req.permission = Permission.USER;
                 }
             }
-        } catch (err) {}
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     req.next();
@@ -111,7 +114,10 @@ app.post('/graphql', bodyParser.json(), apolloExpress((request, response) => {
 }));
 
 if (process.env.NODE_ENV === 'development') {
-    app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+    app.use('/graphiql', graphiqlExpress({
+        endpointURL: '/graphql',
+        subscriptionsEndpoint: `ws://localhost:${cfg.AppPort}/subscriptions`
+    }));
 }
 
 app.get('*', function(req, res, next) {
@@ -119,6 +125,20 @@ app.get('*', function(req, res, next) {
     res.status(404).end();
 });
 
-app.listen(cfg.AppPort, () => console.log(`Now browse to ${cfg.AppHost}:${cfg.AppPort}/graphiql`));
+/**
+ * Subscription Server
+ */
+const ws = createServer(app);
+ws.listen(cfg.AppPort, () => {
+    console.log(`GraphQL Server is now running on http://localhost:${cfg.AppPort}`);
+    new SubscriptionServer({
+        execute,
+        subscribe,
+        schema
+    }, {
+        server: ws,
+        path: '/subscriptions',
+    });
+});
 
 module.exports = app;

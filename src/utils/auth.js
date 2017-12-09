@@ -7,13 +7,13 @@ exports.getTokenFromRequest = req => (
     req.headers.authorization
 );
 
-exports.createToken = payload => (
+exports.createToken = (payload) => (
     jwt.sign(payload, cfg.JwtSecret, {
         expiresIn: cfg.JwtExpired
     })
 );
 
-exports.verifyToken = (token) => (
+exports.verifyToken = async(token) => (
     jwt.verify(token, cfg.JwtSecret)
 );
 

@@ -5,6 +5,7 @@ exports.mutation = `
         registerService(service: HostInput!): Host,
         addCategory(category: CategoryInput!): Category,
         addLocation(location: LocationInput!): Location,
-        rate(review: ReviewInput!): Review
+        rate(review: ReviewInput!): Review,
+        subscribes(locationId: String!): Subscriber
     }
 `;

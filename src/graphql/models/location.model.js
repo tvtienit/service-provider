@@ -38,6 +38,9 @@ const locationSchema = new Schema({
     },
     is_inspected: {
         type: Boolean
+    },
+    subscriberIds: {
+        type: [String]
     }
 }, { collection: 'location', timestamps: true });
 

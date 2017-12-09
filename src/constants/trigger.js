@@ -1,1 +1,1 @@
-export const REQUEST_SERVICE = 'PubSub.RequestServive';
+export const REQUEST_SERVICE = 'PubSub.RequestService';

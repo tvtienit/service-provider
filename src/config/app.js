@@ -6,6 +6,7 @@ exports.cfg = {
     Environment: process.env.NODE_ENV || 'development',
     AppHost: process.env.APP_HOST,
     AppPort: process.env.APP_PORT,
+    WSPort: process.env.WS_PORT,
 
     // Database Configuration
     DBName: process.env.DB_NAME,
@@ -16,7 +17,7 @@ exports.cfg = {
 
     // JWT Configuration
     JwtSecret: process.env.JWT_SECRET,
-    JwtExpired: process.env.JWT_EXPIRED,
+    JwtExpired: process.env.JWT_EXPIRED || '1h',
 
     // CORs Configuration
     CORsWhiteList: process.env.CORs_WHITE || ''

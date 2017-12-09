@@ -10,6 +10,12 @@ const rootType = `
         message: String
     }
 
+    type Subscriber {
+        _id: ID,
+        userId: String,
+        locationId: String,
+    }
+
     type User {
         _id: ID,
         username: String,
