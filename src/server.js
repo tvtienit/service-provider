@@ -3,12 +3,16 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const assert = require('assert');
-const { apolloExpress, graphiqlExpress } = require('apollo-server');
+const { apolloExpress } = require('apollo-server');
 const { schema } = require('./graphql');
 const { getTokenFromRequest, verifyToken } = require('./utils/auth');
 const { cfg } = require('./config/app');
 
 import Permission from './constants/permission';
+import {
+    graphqlExpress,
+    graphiqlExpress,
+} from 'graphql-server-express';
 import { createExpressContext } from 'apollo-resolvers';
 import { formatError as apolloFormatError, createError } from 'apollo-errors';
 import { GraphQLError, execute, subscribe } from 'graphql';

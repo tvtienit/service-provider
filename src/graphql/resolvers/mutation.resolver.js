@@ -33,9 +33,10 @@ const subscribes = isAuthenticatedResolver.createResolver(
     async(_, params, { user }) => {
         const eSub = await model.Subscriber.findOne({ userId: user.id, locationId: params.locationId }).exec();
         const eLoc = await model.Location.findOne({ _id: params.locationId }).exec();
+        const eHost = await model.Host.findOne({ _id: eLoc.hostId }).exec();
         if (eSub) {
             throw new Error("You've subscribed this location before");
-        } else if (eLoc.hostId === user.id) {
+        } else if (eHost.userId === user.id) {
             throw new Error("Cannot subscribe location that you're hosting");
         } else {
             const nSub = await model.Subscriber.create({
