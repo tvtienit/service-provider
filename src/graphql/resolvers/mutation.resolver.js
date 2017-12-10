@@ -165,7 +165,7 @@ const registerService = isAuthenticatedResolver.createResolver(
     async(_, { service }, { user }) => {
         const uObj = await userByObj(user.id);
         if (uObj.is_registered)
-            throw new Error('Bạn đã đăng kí dịch vụ với chúng tôi');
+            throw new Error("You've become a host before");
 
         service.userId = user.id;
         registerHost(user.id);
@@ -189,7 +189,7 @@ mutations = {...mutations, addCategory };
 const rate = isAuthenticatedResolver.createResolver(
     async(_, { review }, { user }) => {
         if (await model.Review.findOne({ userId: user.id }) != null)
-            throw new Error("Bạn đã cho ý kiến về địa điểm này");
+            throw new Error("You've reviewed this location before");
         review.userId = user.id;
         return model.Review.create(review);
     }
