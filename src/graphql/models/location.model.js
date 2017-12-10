@@ -5,7 +5,7 @@ mongoose.Promise = Promise;
 const Schema = mongoose.Schema;
 var Float = require('mongoose-float').loadType(mongoose, 4);
 
-const locationSchema = new Schema({
+const locationSchema = (name, optionFields) => new Schema({
     title: {
         type: String
     },
@@ -33,19 +33,17 @@ const locationSchema = new Schema({
     price: {
         type: Float
     },
-    hostId: {
-        type: String
-    },
     is_inspected: {
         type: Boolean
     },
-    subscriberIds: {
-        type: [String]
-    }
-}, { collection: 'location', timestamps: true });
+    ...optionFields
+}, { collection: name, timestamps: true });
 
-locationSchema.plugin(mongoosePaginate);
+const location = locationSchema('location', { hostId: { type: String } });
+location.plugin(mongoosePaginate);
 
-const mLocation = mongoose.model('location', locationSchema);
+const mLocation = mongoose.model('location', location);
+const locDraft = mongoose.model('location_draft', locationSchema('location_draft', { realId: { type: String } }));
 
 exports.Location = mLocation;
+exports.LocationDraft = locDraft;

@@ -1,7 +1,8 @@
+"use strict"
 import { query } from './query.type';
 import { mutation } from './mutation.type';
 import { subscription } from './subscription.type';
-import _ from 'lodash';
+import { intf } from './interface.type';
 
 const rootType = `
     type Auth {
@@ -24,7 +25,8 @@ const rootType = `
         phone: String,
         registration_date: String,
         registered: Host,
-        reviews: [Review]
+        reviews: [Review],
+        subLocations: [Location]
     }
 
     type Host {
@@ -49,7 +51,7 @@ const rootType = `
         content: String
     }
 
-    type Location {
+    type Location implements ILocation {
         _id: ID,
         title: String,
         description: String,
@@ -60,10 +62,27 @@ const rootType = `
         lat: Float,
         long: Float,
         price: Float,
+        is_inspected: Boolean
         host: Host,
         reviews: [Review],
+        subscribers: [User]
+    }
+
+    # Describe the draft version of a location that've edited by its own hoster
+    type LocationDraft implements ILocation {
+        _id: ID,
+        title: String,
+        description: String,
+        category: Category,
+        city: String,
+        img_source: String,
+        address: String,
+        lat: Float,
+        long: Float,
+        price: Float,
         is_inspected: Boolean
+        realId: String
     }
 `;
 
-exports.RootType = rootType.concat(query, mutation, subscription);
+exports.RootType = rootType.concat(query, mutation, subscription, intf);

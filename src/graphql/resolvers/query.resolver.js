@@ -46,7 +46,20 @@ const locationsByCity = (_, { city, page, limit }) => {
         sort: { created_at: -1 },
     }).then(result => result.docs);
 };
-queries = {...queries, locationsByCity };
+
+const inspectedLocations = () => {
+    return model.Location.find({ is_inspected: true }).exec();
+};
+
+const unInspectedLocations = () => {
+    return model.Location.find({ $or: [{ is_inspected: false }, { is_inspected: null }] }).exec();
+};
+
+const locationDrafts = () => {
+    return model.LocationDraft.find({}).exec();
+}
+
+queries = {...queries, locationsByCity, inspectedLocations, unInspectedLocations, locationDrafts };
 //endregion
 
 exports.queries = {

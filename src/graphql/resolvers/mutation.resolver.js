@@ -54,6 +54,12 @@ mutations = {...mutations, subscribes };
 //endregion
 
 //region user
+const profile = isAuthenticatedResolver.createResolver(
+    (_, params, { user }) => {
+        return model.User.findOne({ _id: user.id }).exec();
+    }
+);
+
 const register = isGuestResolver.createResolver(
     (root, args, context) => {
         return new Promise((resolve, reject) => {
@@ -151,7 +157,7 @@ const login = isGuestResolver.createResolver(
         }).then(token => token);
     }
 );
-mutations = {...mutations, login, register };
+mutations = {...mutations, login, register, profile };
 //endregion
 
 //region host
@@ -197,7 +203,37 @@ const addLocation = isAdminResolver.createResolver(
         return model.Location.create(location);
     }
 );
-mutations = {...mutations, addLocation };
+
+const inspect = isAdminResolver.createResolver(
+    (_, { locationId }, context) => {
+        return model.Location.findByIdAndUpdate(locationId, { is_inspected: true }, { new: true }).exec();
+    }
+);
+
+const undoInspection = isAdminResolver.createResolver(
+    (_, { locationId }, context) => {
+        return model.Location.findByIdAndUpdate(locationId, { is_inspected: false }, { new: true }).exec();
+    }
+);
+
+const updateLocation = isAuthenticatedResolver.createResolver(
+    (_, { locationId, location }, { user }) => {
+        location.realId = locationId;
+        location.hostId = null;
+        return model.LocationDraft.create(location);
+    }
+);
+
+const inspectUpdation = isAdminResolver.createResolver(
+    async(_, { draftId }) => {
+        const currentDraft = await model.LocationDraft.findOne({ _id: draftId }, '-_id').exec();
+        if (!currentDraft) throw new Error('Draft not found');
+        const updated = await model.Location.findByIdAndUpdate(currentDraft.realId, currentDraft, { new: true }).exec();
+        await model.LocationDraft.findByIdAndRemove(draftId);
+        return updated;
+    }
+);
+mutations = {...mutations, addLocation, inspect, undoInspection, updateLocation, inspectUpdation };
 //endregion
 
 exports.mutations = {

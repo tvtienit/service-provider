@@ -1,4 +1,5 @@
 import * as model from '../models';
+import lds from 'lodash';
 
 const filters = {
     Auth: {
@@ -15,7 +16,15 @@ const filters = {
             _.createdAt.toISOString()
             .replace(/T/, ' ')
             .replace(/\..+/, '')
-        )
+        ),
+        subLocations: async(_) => {
+            const allSubs = await model.Subscriber.find({ userId: _._id }).exec();
+            const subLocs = lds.forEach(allSubs, async(sub) => {
+                return await model.Location.findOne({ _id: sub.locationId }).exec();
+            });
+
+            return subLocs;
+        }
     },
     Host: {
         location: (_) => {
@@ -40,7 +49,15 @@ const filters = {
         reviews: (_) => {
             return model.Review.find({ locationId: _._id }).exec();
         },
-        is_inspected: (_) => (!_.is_inspected) ? false : _.is_inspected
+        is_inspected: (_) => (!_.is_inspected) ? false : _.is_inspected,
+        subscribers: async(_) => {
+            const allSubs = await model.Subscriber.find({ locationId: _._id }).exec();
+            const subUsers = lds.forEach(allSubs, async(sub) => {
+                return await model.User.findOne({ _id: sub.userId }).exec();
+            });
+
+            return subUsers;
+        }
     }
 };
 
