@@ -7,6 +7,10 @@ exports.getTokenFromRequest = req => (
     req.headers.authorization
 );
 
+exports.getSysTokenFromRequest = req => (
+    req.headers.sys_authorization
+);
+
 exports.createToken = (payload) => (
     jwt.sign(payload, cfg.JwtSecret, {
         expiresIn: cfg.JwtExpired

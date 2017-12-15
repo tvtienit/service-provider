@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const assert = require('assert');
 const { apolloExpress } = require('apollo-server');
 const { schema } = require('./graphql');
-const { getTokenFromRequest, verifyToken } = require('./utils/auth');
+const { getTokenFromRequest, getSysTokenFromRequest, verifyToken } = require('./utils/auth');
 const { cfg } = require('./config/app');
 
 import Permission from './constants/permission';
@@ -60,7 +60,8 @@ const formatError = error => {
  * Middleware for authorizarion
  */
 const isAuth = async(req) => {
-    const token = getTokenFromRequest(req);
+    const token = getTokenFromRequest(req) || getSysTokenFromRequest(req);
+
     if (!token) {
         req.user = null;
         req.permission = Permission.GUEST;
