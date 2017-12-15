@@ -12,6 +12,4 @@ const resolvers = combineResolvers([
     subscriptions
 ]);
 
-console.log(resolvers);
-
 exports.resolvers = resolvers;

@@ -22,7 +22,7 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 mongoose.Promise = global.Promise;
 const dbConnectionString =
     'mongodb://'
-    .concat((cfg.DBAsync == 1) ? `${cfg.DBUser}:${cfg.DBPwd}@` : '')
+    .concat((cfg.DBSync == 1) ? `${cfg.DBUser}:${cfg.DBPwd}@` : '')
     .concat(`${cfg.DBHost}:${cfg.DBPort}/${cfg.DBName}`);
 
 mongoose.connect(dbConnectionString, (err, db) => {

@@ -178,7 +178,6 @@ mutations = {...mutations, registerService };
 //region category
 const addCategory = isAdminResolver.createResolver(
     (_, { category }, context) => {
-        console.log(category);
         return model.Category.create(category);
     }
 );
