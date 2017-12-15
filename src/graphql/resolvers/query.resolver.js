@@ -33,7 +33,9 @@ const categoriesByCity = async(_, { cgrId, city, page, limit }, context) => {
         return cgrs;
     });
 };
-queries = {...queries, categoriesByCity };
+
+const categories = () => model.Category.find({}).exec();
+queries = {...queries, categoriesByCity, categories };
 //endregion
 
 //region location

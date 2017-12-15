@@ -20,7 +20,12 @@ import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 
 mongoose.Promise = global.Promise;
-mongoose.connect(`mongodb://${cfg.DBHost}:${cfg.DBPort}/${cfg.DBName}`, (err, db) => {
+const dbConnectionString =
+    'mongodb://'
+    .concat((cfg.DBAsync == 1) ? `${cfg.DBUser}:${cfg.DBPwd}@` : '')
+    .concat(`${cfg.DBHost}:${cfg.DBPort}/${cfg.DBName}`);
+
+mongoose.connect(dbConnectionString, (err, db) => {
     assert.equal(null, err);
 });
 
@@ -102,7 +107,7 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use(isAuth);
 
-app.post('/graphql', bodyParser.json(), apolloExpress((request, response) => {
+app.post('/graphql', bodyParser.json(), graphqlExpress((request, response) => {
     const user = request.user;
     const permission = request.permission;
     const context = createExpressContext({

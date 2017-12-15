@@ -9,6 +9,7 @@ exports.cfg = {
     WSPort: process.env.WS_PORT,
 
     // Database Configuration
+    DBAsync: process.env.DB_ASYNC || 0,
     DBName: process.env.DB_NAME,
     DBHost: process.env.DB_HOST,
     DBPort: process.env.DB_PORT,
