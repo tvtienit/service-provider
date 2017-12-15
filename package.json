@@ -27,11 +27,13 @@
         "graphql-server-express": "^1.2.0",
         "graphql-subscriptions": "^0.5.5",
         "graphql-tools": "^2.12.0",
+        "js-remove-property": "^1.0.5",
         "jsonwebtoken": "^8.1.0",
         "mongoose": "^4.13.6",
         "mongoose-float": "^1.0.2",
         "mongoose-paginate": "^5.0.3",
         "node-fetch": "^1.7.3",
+        "node-suggestive-search": "^1.9.2",
         "subscriptions-transport-ws": "^0.9.4",
         "validator": "^9.1.2"
     },

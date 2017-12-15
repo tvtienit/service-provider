@@ -1,8 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const assert = require('assert');
 const { apolloExpress } = require('apollo-server');
 const { schema } = require('./graphql');
 const { getTokenFromRequest, getSysTokenFromRequest, verifyToken } = require('./utils/auth');
@@ -18,20 +16,11 @@ import { formatError as apolloFormatError, createError } from 'apollo-errors';
 import { GraphQLError, execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { runDatabase } from './utils/database';
 
-mongoose.Promise = global.Promise;
-const dbConnectionString =
-    'mongodb://'
-    .concat((cfg.DBSync == 1) ? `${cfg.DBUser}:${cfg.DBPwd}@` : '')
-    .concat(`${cfg.DBHost}:${cfg.DBPort}/${cfg.DBName}`);
+// Start MongoDB
+runDatabase();
 
-mongoose.connect(dbConnectionString, (err, db) => {
-    assert.equal(null, err);
-});
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'Connection error:'));
-db.once('open', () => console.log('MongoDB\'s connected'));
 const app = express();
 
 const UnknownError = createError('UnknownError', {

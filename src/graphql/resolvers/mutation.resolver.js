@@ -1,5 +1,6 @@
 import * as model from '../models';
 import lds from 'lodash';
+import removeProperty from 'js-remove-property';
 import { isGuestResolver } from './guest.resolver';
 import { isAdminResolver } from './admin.resolver';
 import { isAuthenticatedResolver } from './auth.resolver';
@@ -181,7 +182,17 @@ const addCategory = isAdminResolver.createResolver(
         return model.Category.create(category);
     }
 );
-mutations = {...mutations, addCategory };
+
+const updateCategory = isAdminResolver.createResolver(
+    (_, { categoryId, category }, context) => {
+        return model.Category.findByIdAndUpdate(categoryId, category, { new: true }).exec();
+    }
+);
+
+const deleteCategory = isAdminResolver.createResolver(
+    (_, { categoryId }, context) => model.Category.findByIdAndRemove(categoryId).exec()
+);
+mutations = {...mutations, addCategory, updateCategory, deleteCategory };
 //endregion
 
 //region review

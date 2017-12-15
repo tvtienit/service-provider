@@ -4,6 +4,8 @@ exports.mutation = `
         register(user: UserInput!): String,
         registerService(service: HostInput!): Host,
         addCategory(category: CategoryInput!): Category,
+        updateCategory(categoryId: String!,category: CategoryInput!): Category,
+        deleteCategory(categoryId: String!): Category,
         addLocation(location: LocationInput!): Location,
         rate(review: ReviewInput!): Review,
         subscribes(locationId: String!): Subscriber,
