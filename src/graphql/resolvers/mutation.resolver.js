@@ -224,9 +224,9 @@ mutations = {...mutations, rate };
 
 //region location
 const addLocation = isAuthenticatedResolver.createResolver(
-    async(_, { location }) => {
-        const user = await profile();
-        if (user.is_registered) throw new Error('You\'ve added your location before');
+    async(_, { location }, { user }) => {
+        const cUser = await profile();
+        if (cUser.is_registered) throw new Error('You\'ve added your location before');
         return model.Location.create(location);
     }
 );
