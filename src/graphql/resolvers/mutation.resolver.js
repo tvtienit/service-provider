@@ -6,7 +6,7 @@ import { isAdminResolver } from './admin.resolver';
 import { isAuthenticatedResolver } from './auth.resolver';
 import { pubsub } from './../../utils/pubsub';
 import { REQUEST_SERVICE } from './../../constants/trigger';
-
+import { nss } from '../../utils/database';
 const isEmail = require('validator/lib/isEmail');
 
 const {
@@ -55,6 +55,15 @@ mutations = {...mutations, subscribes };
 //endregion
 
 //region user
+const users = (_, { page, limit }) => {
+    page = (!page) ? 1 : page;
+    limit = (!limit) ? 10 : limit;
+    return model.User.paginate({}, {
+        page: page,
+        limit: limit,
+        sort: { created_at: -1 },
+    }).then(result => result.docs);
+};
 const profile = isAuthenticatedResolver.createResolver(
     (_, params, { user }) => {
         return model.User.findOne({ _id: user.id }).exec();
@@ -158,7 +167,7 @@ const login = isGuestResolver.createResolver(
         }).then(token => token);
     }
 );
-mutations = {...mutations, login, register, profile };
+mutations = {...mutations, login, register, profile, users };
 //endregion
 
 //region host
@@ -192,7 +201,13 @@ const updateCategory = isAdminResolver.createResolver(
 const deleteCategory = isAdminResolver.createResolver(
     (_, { categoryId }, context) => model.Category.findByIdAndRemove(categoryId).exec()
 );
-mutations = {...mutations, addCategory, updateCategory, deleteCategory };
+
+const searchCategories = (_, { words }, context) => {
+    return [{
+        title: "Đm chưa làm, khó vc"
+    }];
+};
+mutations = {...mutations, addCategory, updateCategory, deleteCategory, searchCategories };
 //endregion
 
 //region review
@@ -208,8 +223,10 @@ mutations = {...mutations, rate };
 //endregion
 
 //region location
-const addLocation = isAdminResolver.createResolver(
-    (_, { location }, context) => {
+const addLocation = isAuthenticatedResolver.createResolver(
+    async(_, { location }) => {
+        const user = await profile();
+        if (user.is_registered) throw new Error('You\'ve added your location before');
         return model.Location.create(location);
     }
 );

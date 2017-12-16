@@ -6,6 +6,7 @@ exports.mutation = `
         addCategory(category: CategoryInput!): Category,
         updateCategory(categoryId: String!,category: CategoryInput!): Category,
         deleteCategory(categoryId: String!): Category,
+        searchCategories(words: String!): [Category],
         addLocation(location: LocationInput!): Location,
         rate(review: ReviewInput!): Review,
         subscribes(locationId: String!): Subscriber,
@@ -13,6 +14,7 @@ exports.mutation = `
         undoInspection(locationId: String): Location,
         updateLocation(locationId: String, location: LocationInput!): LocationDraft,
         inspectUpdation(draftId: String): Location,
-        profile: User
+        profile: User,
+        users(page: Int, limit: Int): [User]
     }
 `;
