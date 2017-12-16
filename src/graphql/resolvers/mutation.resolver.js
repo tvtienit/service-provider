@@ -226,7 +226,7 @@ mutations = {...mutations, rate };
 const addLocation = isAuthenticatedResolver.createResolver(
     async(_, { location }, { user }) => {
         const host = await model.Host.findOne({ userId: user.id }).exec();
-        const eLocation = await model.Location.findOne({ _id: host.locationId }).exec();
+        const eLocation = await model.Location.findOne({ hostId: host._id }).exec();
         if (eLocation) throw new Error('You \'ve registered your own location before');
         return model.Location.create(location);
     }
