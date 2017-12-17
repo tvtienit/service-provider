@@ -203,7 +203,10 @@ const deleteCategory = isAdminResolver.createResolver(
 );
 
 const searchCategories = (_, { words }, context) => {
-    nss.query
+    return model.Category
+        .find({ $text: { $search: words } })
+        .sort({ createdAt: -1 })
+        .exec();
 };
 mutations = {...mutations, addCategory, updateCategory, deleteCategory, searchCategories };
 //endregion

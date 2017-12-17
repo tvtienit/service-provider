@@ -26,6 +26,9 @@ const filters = {
             return subLocs;
         }
     },
+    Category: {
+        locations: (_) => _.locations ? _.locations : model.Location.find({ categoryId: _.id }).exec()
+    },
     Host: {
         location: (_) => {
             return model.Location.findOne({ hostId: _._id }).exec();
