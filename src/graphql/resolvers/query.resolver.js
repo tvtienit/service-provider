@@ -51,6 +51,8 @@ const locationsByCity = (_, { city, page, limit }) => {
     }).then(result => result.docs);
 };
 
+const locationById = (_, { locationId }) => model.Location.findOne({ _id: locationId }).exec();
+
 const inspectedLocations = () => {
     return model.Location.find({ is_inspected: true }).exec();
 };
@@ -63,7 +65,7 @@ const locationDrafts = () => {
     return model.LocationDraft.find({}).exec();
 }
 
-queries = {...queries, locationsByCity, inspectedLocations, unInspectedLocations, locationDrafts };
+queries = {...queries, locationsByCity, inspectedLocations, unInspectedLocations, locationDrafts, locationById };
 //endregion
 
 exports.queries = {
