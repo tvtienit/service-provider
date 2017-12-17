@@ -35,14 +35,16 @@ const categoriesByCity = async(_, { cgrId, city, page, limit }, context) => {
 };
 
 const categories = () => model.Category.find({}).exec();
-queries = {...queries, categoriesByCity, categories };
+
+const categoryById = (_, { categoryId }) => model.Category.findOne({ _id: categoryId }).exec();
+queries = {...queries, categoriesByCity, categories, categoryById };
 //endregion
 
 //region location
 const locationsByCity = (_, { city, page, limit }) => {
     page = (!page) ? 1 : page;
     limit = (!limit) ? 10 : limit;
-    return model.Location.paginate({ city: city }, {
+    return model.Location.paginate({ city: city, is_inspected: true }, {
         page: page,
         limit: limit,
         sort: { created_at: -1 },

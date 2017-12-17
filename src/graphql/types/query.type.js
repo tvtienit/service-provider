@@ -5,6 +5,7 @@ exports.query = `
         categories: [Category],
         firstByUsername(username: String!): User,
         categoriesByCity(cgrId: String, city: String!, page: Int, limit: Int): [Category],
+        categoryById(categoryId: String!): Category,
         locationsByCity(city: String!, page: Int, limit: Int): [Location],
         inspectedLocations: [Location],
         unInspectedLocations: [Location],

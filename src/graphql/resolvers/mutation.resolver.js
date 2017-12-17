@@ -203,9 +203,7 @@ const deleteCategory = isAdminResolver.createResolver(
 );
 
 const searchCategories = (_, { words }, context) => {
-    return [{
-        title: "Đm chưa làm, khó vc"
-    }];
+    nss.query
 };
 mutations = {...mutations, addCategory, updateCategory, deleteCategory, searchCategories };
 //endregion
@@ -229,6 +227,22 @@ const addLocation = isAuthenticatedResolver.createResolver(
         const eLocation = await model.Location.findOne({ hostId: host._id }).exec();
         if (eLocation) throw new Error('You \'ve registered your own location before');
         return model.Location.create(location);
+    }
+);
+
+const deleteLocation = isAdminResolver.createResolver(
+    async(_, { locationId }, { user }) => {
+        await model.LocationDraft.remove({ locationId: locationId }, (err) => {
+            if (err) throw err;
+        });
+        return model.Location.findByIdAndRemove(locationId).exec();
+    }
+);
+
+const deleleAllLocations = isAdminResolver.createResolver(
+    async(_, {}, { user }) => {
+        await model.Location.remove({});
+        return "OK";
     }
 );
 
@@ -261,7 +275,7 @@ const inspectUpdation = isAdminResolver.createResolver(
         return updated;
     }
 );
-mutations = {...mutations, addLocation, inspect, undoInspection, updateLocation, inspectUpdation };
+mutations = {...mutations, addLocation, inspect, undoInspection, updateLocation, inspectUpdation, deleteLocation, deleleAllLocations };
 //endregion
 
 exports.mutations = {

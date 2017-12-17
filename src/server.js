@@ -69,6 +69,7 @@ const isAuth = async(req) => {
             }
         } catch (err) {
             console.log(err);
+            if (!req.user) req.permission = Permission.GUEST;
         }
     }
 
