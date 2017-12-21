@@ -40,7 +40,11 @@ const filters = {
         },
         location: (_) => {
             return model.Location.findOne({ _id: _.locationId }).exec();
-        }
+        },
+        date: (_) => (
+            _.createdAt.toISOString()
+            .replace(/T/, ' ')
+            .replace(/\..+/, '')
     },
     Location: {
         category: (_) => {

@@ -48,7 +48,8 @@ const rootType = `
         user: User,
         location: Location,
         stars: Int,
-        content: String
+        content: String,
+        date: Date
     }
 
     type Location implements ILocation {
