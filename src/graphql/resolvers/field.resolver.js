@@ -45,6 +45,7 @@ const filters = {
             _.createdAt.toISOString()
             .replace(/T/, ' ')
             .replace(/\..+/, '')
+        )
     },
     Location: {
         category: (_) => {

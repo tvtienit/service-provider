@@ -4,6 +4,7 @@ exports.mutation = `
         register(user: UserInput!): String,
         searchUsers(words: String!): [User],
         registerService(service: HostInput!): Host,
+        updateHost(host: HostInput!): Host,
         searchHosts(words: String): [Host],
         addCategory(category: CategoryInput!): Category,
         updateCategory(categoryId: String!,category: CategoryInput!): Category,

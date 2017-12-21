@@ -199,8 +199,16 @@ const registerService = isAuthenticatedResolver.createResolver(
     }
 );
 
+const updateHost = isAuthenticatedResolver.createResolver(
+    (_, { host }, { user }) => {
+        const currentHost = model.Host.findOne({ userId: user.id }).exec();
+        if (!currentHost) throw new Error("This host does not exist");
+        return model.Host.findByIdAndUpdate(currentHost._id, host, { new: true }).exec();
+    }
+);
+
 const searchHosts = (_, { words }) => search(model.Host, words);
-mutations = {...mutations, registerService, searchHosts };
+mutations = {...mutations, registerService, searchHosts, updateHost };
 //endregion
 
 //region category

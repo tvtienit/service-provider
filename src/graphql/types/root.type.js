@@ -32,7 +32,9 @@ const rootType = `
     type Host {
         _id: ID,
         user: User,
+        host_title: String,
         phone: String,
+        head_office: String,
         location: [Location]
     }
 
@@ -49,7 +51,7 @@ const rootType = `
         location: Location,
         stars: Int,
         content: String,
-        date: Date
+        date: String
     }
 
     type Location implements ILocation {

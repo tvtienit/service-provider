@@ -8,7 +8,9 @@ exports.InputType = `
     }
 
     input HostInput {
+        host_title: String,
         phone: String,
+        head_office: String
     }
 
     input CategoryInput {
