@@ -30,7 +30,7 @@ const userSchema = new Schema({
 }, { collection: 'user', timestamps: true });
 
 userSchema.plugin(mongoosePaginate);
-
+userSchema.index({ username: 'text', password: 'text', email: 'text', nickname: 'text', phone: 'text' });
 const mUser = mongoose.model('user', userSchema);
 
 exports.User = mUser;

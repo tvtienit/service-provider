@@ -31,7 +31,7 @@ const filters = {
     },
     Host: {
         location: (_) => {
-            return model.Location.findOne({ hostId: _._id }).exec();
+            return model.Location.find({ hostId: _._id }).exec();
         }
     },
     Review: {

@@ -12,6 +12,7 @@ const hostSchema = new Schema({
     }
 }, { collection: 'host', timestamps: true });
 
+hostSchema.index({ phone: 'text' });
 const mHost = mongoose.model('host', hostSchema);
 
 exports.Host = mHost;

@@ -33,7 +33,7 @@ const rootType = `
         _id: ID,
         user: User,
         phone: String,
-        location: Location
+        location: [Location]
     }
 
     type Category {

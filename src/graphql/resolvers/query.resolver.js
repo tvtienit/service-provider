@@ -1,5 +1,6 @@
 import * as model from '../models';
 import { verifyToken } from '../../utils/auth';
+import { isAuthenticatedResolver } from './auth.resolver';
 
 let queries = {};
 
@@ -51,6 +52,16 @@ const locationsByCity = (_, { city, page, limit }) => {
     }).then(result => result.docs);
 };
 
+const locationsByHost = isAuthenticatedResolver.createResolver(
+    async(_, params, { user }) => {
+        const currentHost = await model.Host.findOne({ userId: user.id }).exec();
+        if (!currentHost)
+            throw new Error("You have to become a host first");
+        
+        return model.Location.find({hostId: currentHost._id}).exec();
+    }
+);
+
 const locationById = (_, { locationId }) => model.Location.findOne({ _id: locationId }).exec();
 
 const inspectedLocations = () => {
@@ -65,7 +76,7 @@ const locationDrafts = () => {
     return model.LocationDraft.find({}).exec();
 }
 
-queries = {...queries, locationsByCity, inspectedLocations, unInspectedLocations, locationDrafts, locationById };
+queries = {...queries, locationsByCity, inspectedLocations, unInspectedLocations, locationDrafts, locationById, locationsByHost };
 //endregion
 
 exports.queries = {

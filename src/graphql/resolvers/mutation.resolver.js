@@ -22,6 +22,23 @@ const userByObj = (userId) => {
     return model.User.findOne({ _id: userId }).exec();
 };
 
+const search = (model, words, options) => {
+    return model
+        .find({ $text: { $search: words }, ...options })
+        .sort({ createdAt: -1 })
+        .exec();
+}
+
+const paginate = (model, options, page, limit) => {
+    page = (!page) ? 1 : page;
+    limit = (!limit) ? 10 : limit;
+    return model.paginate(options, {
+        page: page,
+        limit: limit,
+        sort: { created_at: -1 },
+    }).then(result => result.docs);
+}
+
 const registerHost = (userId) => {
     return model.User.findOne({ _id: userId }, { new: true }).exec((err, user) => {
         user.is_registered = true;
@@ -55,15 +72,14 @@ mutations = {...mutations, subscribes };
 //endregion
 
 //region user
-const users = (_, { page, limit }) => {
-    page = (!page) ? 1 : page;
-    limit = (!limit) ? 10 : limit;
-    return model.User.paginate({}, {
-        page: page,
-        limit: limit,
-        sort: { created_at: -1 },
-    }).then(result => result.docs);
+const searchUsers = (_, { words }) => {
+    return search(model.User, words);
 };
+
+const users = (_, { page, limit }) => {
+    return paginate(model.User, {}, page, limit);
+};
+
 const profile = isAuthenticatedResolver.createResolver(
     (_, params, { user }) => {
         return model.User.findOne({ _id: user.id }).exec();
@@ -167,7 +183,7 @@ const login = isGuestResolver.createResolver(
         }).then(token => token);
     }
 );
-mutations = {...mutations, login, register, profile, users };
+mutations = {...mutations, login, register, profile, users, searchUsers };
 //endregion
 
 //region host
@@ -182,7 +198,9 @@ const registerService = isAuthenticatedResolver.createResolver(
         return model.Host.create(service);
     }
 );
-mutations = {...mutations, registerService };
+
+const searchHosts = (_, { words }) => search(model.Host, words);
+mutations = {...mutations, registerService, searchHosts };
 //endregion
 
 //region category
@@ -203,10 +221,7 @@ const deleteCategory = isAdminResolver.createResolver(
 );
 
 const searchCategories = (_, { words }, context) => {
-    return model.Category
-        .find({ $text: { $search: words } })
-        .sort({ createdAt: -1 })
-        .exec();
+    return search(model.Category, words);
 };
 mutations = {...mutations, addCategory, updateCategory, deleteCategory, searchCategories };
 //endregion
@@ -225,16 +240,17 @@ mutations = {...mutations, rate };
 
 //region location
 const addLocation = isAuthenticatedResolver.createResolver(
-    async(_, { location }, { user }) => {
-        const host = await model.Host.findOne({ userId: user.id }).exec();
-        const eLocation = await model.Location.findOne({ hostId: host._id }).exec();
-        if (eLocation) throw new Error('You \'ve registered your own location before');
+    (_, { location }, { user }) => {
         return model.Location.create(location);
     }
 );
 
-const deleteLocation = isAdminResolver.createResolver(
+const deleteLocation = isAuthenticatedResolver.createResolver(
     async(_, { locationId }, { user }) => {
+        const currentHost = await model.Host.findOne({userId: user.id}).exec();
+        const currentLocation = await model.Location.findOne({_id: locationId, hostId: currentHost._id}).exec();
+        if (!currentLocation) 
+            throw new Error("You're not this location's owner");
         await model.LocationDraft.remove({ locationId: locationId }, (err) => {
             if (err) throw err;
         });
@@ -255,6 +271,10 @@ const inspect = isAdminResolver.createResolver(
     }
 );
 
+const searchInspected = (_, { words }) => search(model.Location, words, { is_inspected: true });
+const searchUninspected = (_, { words }) => search(model.Location, words, { is_inspected: false });
+const searchDrafts = (_, { words }) => search(model.LocationDraft, words);
+
 const undoInspection = isAdminResolver.createResolver(
     (_, { locationId }, context) => {
         return model.Location.findByIdAndUpdate(locationId, { is_inspected: false }, { new: true }).exec();
@@ -262,7 +282,11 @@ const undoInspection = isAdminResolver.createResolver(
 );
 
 const updateLocation = isAuthenticatedResolver.createResolver(
-    (_, { locationId, location }, { user }) => {
+    async(_, { locationId, location }, { user }) => {
+        const currentHost = await model.Host.findOne({userId: user.id}).exec();
+        const currentLocation = await model.Location.findOne({_id: locationId, hostId: currentHost._id}).exec();
+        if (!currentLocation) 
+            throw new Error("You're not this location's owner");
         location.realId = locationId;
         location.hostId = null;
         return model.LocationDraft.create(location);
@@ -278,7 +302,7 @@ const inspectUpdation = isAdminResolver.createResolver(
         return updated;
     }
 );
-mutations = {...mutations, addLocation, inspect, undoInspection, updateLocation, inspectUpdation, deleteLocation, deleleAllLocations };
+mutations = {...mutations, addLocation, inspect, undoInspection, updateLocation, inspectUpdation, deleteLocation, deleleAllLocations, searchInspected, searchUninspected, searchDrafts };
 //endregion
 
 exports.mutations = {

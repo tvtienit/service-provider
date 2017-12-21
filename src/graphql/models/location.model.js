@@ -40,6 +40,7 @@ const locationSchema = (name, optionFields) => new Schema({
 }, { collection: name, timestamps: true });
 
 const location = locationSchema('location', { hostId: { type: String } });
+location.index({ title: 'text', description: 'text', city: 'text', address: 'text' });
 location.plugin(mongoosePaginate);
 
 const mLocation = mongoose.model('location', location);
