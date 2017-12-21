@@ -4,9 +4,19 @@ import { isAuthenticatedResolver } from './auth.resolver';
 
 let queries = {};
 
+const paginate = (model, options, page, limit) => {
+    page = (!page) ? 1 : page;
+    limit = (!limit) ? 10 : limit;
+    return model.paginate(options, {
+        page: page,
+        limit: limit,
+        sort: { created_at: -1 },
+    }).then(result => result.docs);
+}
+
 //region user
-const users = () => {
-    return model.User.find({}).exec();
+const users = (_, { page, limit }) => {
+    return paginate(model.User, {}, page, limit);
 };
 
 const firstByUsername = (root, params) => {
@@ -35,7 +45,9 @@ const categoriesByCity = async(_, { cgrId, city, page, limit }, context) => {
     });
 };
 
-const categories = () => model.Category.find({}).exec();
+const categories = (_, { page, limit }) => {
+    return paginate(model.Category, {}, page, limit);
+};
 
 const categoryById = (_, { categoryId }) => model.Category.findOne({ _id: categoryId }).exec();
 queries = {...queries, categoriesByCity, categories, categoryById };
@@ -43,13 +55,7 @@ queries = {...queries, categoriesByCity, categories, categoryById };
 
 //region location
 const locationsByCity = (_, { city, page, limit }) => {
-    page = (!page) ? 1 : page;
-    limit = (!limit) ? 10 : limit;
-    return model.Location.paginate({ city: city, is_inspected: true }, {
-        page: page,
-        limit: limit,
-        sort: { created_at: -1 },
-    }).then(result => result.docs);
+    return paginate(model.Location, { city: city, is_inspected: true }, page, limit);
 };
 
 const locationsByHost = isAuthenticatedResolver.createResolver(
@@ -64,16 +70,16 @@ const locationsByHost = isAuthenticatedResolver.createResolver(
 
 const locationById = (_, { locationId }) => model.Location.findOne({ _id: locationId }).exec();
 
-const inspectedLocations = () => {
-    return model.Location.find({ is_inspected: true }).exec();
+const inspectedLocations = (_, { page, limit }) => {
+    return paginate(model.Location, { is_inspected: true }, page, limit);
 };
 
-const unInspectedLocations = () => {
-    return model.Location.find({ $or: [{ is_inspected: false }, { is_inspected: null }] }).exec();
+const unInspectedLocations = (_, { page, limit }) => {
+    return paginate(model.Location, { $or: [{ is_inspected: false }, { is_inspected: null }] }, page, limit);
 };
 
-const locationDrafts = () => {
-    return model.LocationDraft.find({}).exec();
+const locationDrafts = (_, { page, limit }) => {
+    return paginate(model.LocationDraft, {}, page, limit);
 }
 
 queries = {...queries, locationsByCity, inspectedLocations, unInspectedLocations, locationDrafts, locationById, locationsByHost };

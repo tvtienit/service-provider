@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+const mongoosePaginate = require('mongoose-paginate');
 mongoose.Promise = Promise;
 
 const Schema = mongoose.Schema;
@@ -12,7 +13,8 @@ const categorySchema = new Schema({
     }
 }, { collection: 'category', timestamps: true });
 
-const mCategory = mongoose.model('category', categorySchema);
+categorySchema.plugin(mongoosePaginate);
 categorySchema.index({ title: 'text', description: 'text' });
+const mCategory = mongoose.model('category', categorySchema);
 
 exports.Category = mCategory;

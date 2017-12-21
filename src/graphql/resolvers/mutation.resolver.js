@@ -29,16 +29,6 @@ const search = (model, words, options) => {
         .exec();
 }
 
-const paginate = (model, options, page, limit) => {
-    page = (!page) ? 1 : page;
-    limit = (!limit) ? 10 : limit;
-    return model.paginate(options, {
-        page: page,
-        limit: limit,
-        sort: { created_at: -1 },
-    }).then(result => result.docs);
-}
-
 const registerHost = (userId) => {
     return model.User.findOne({ _id: userId }, { new: true }).exec((err, user) => {
         user.is_registered = true;
@@ -74,10 +64,6 @@ mutations = {...mutations, subscribes };
 //region user
 const searchUsers = (_, { words }) => {
     return search(model.User, words);
-};
-
-const users = (_, { page, limit }) => {
-    return paginate(model.User, {}, page, limit);
 };
 
 const profile = isAuthenticatedResolver.createResolver(
@@ -183,7 +169,7 @@ const login = isGuestResolver.createResolver(
         }).then(token => token);
     }
 );
-mutations = {...mutations, login, register, profile, users, searchUsers };
+mutations = {...mutations, login, register, profile, searchUsers };
 //endregion
 
 //region host
