@@ -40,11 +40,13 @@ const locationSchema = (name, optionFields) => new Schema({
 }, { collection: name, timestamps: true });
 
 const location = locationSchema('location', { hostId: { type: String } });
+const locationDraft = locationSchema('location_draft', { realId: { type: String } });
 location.index({ title: 'text', description: 'text', city: 'text', address: 'text' });
 location.plugin(mongoosePaginate);
+locationDraft.plugin(mongoosePaginate);
 
 const mLocation = mongoose.model('location', location);
-const locDraft = mongoose.model('location_draft', locationSchema('location_draft', { realId: { type: String } }));
+const locDraft = mongoose.model('location_draft', locationDraft);
 
 exports.Location = mLocation;
 exports.LocationDraft = locDraft;
