@@ -223,7 +223,7 @@ mutations = {...mutations, addCategory, updateCategory, deleteCategory, searchCa
 //region review
 const rate = isAuthenticatedResolver.createResolver(
     async(_, { review }, { user }) => {
-        const isReviewed = await model.Review.findOne({ userId: user.id }).exec();
+        const isReviewed = await model.Review.findOne({ locationId: review.locationId, userId: user.id }).exec();
         if (isReviewed)
             throw new Error("You've reviewed this location before");
         review.userId = user.id;
