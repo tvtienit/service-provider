@@ -266,6 +266,12 @@ const inspect = isAdminResolver.createResolver(
     }
 );
 
+const searchByHost = isAuthenticatedResolver.createResolver(
+    async(_, { words }, { user }) => {
+        const host = await model.Host.findOne({ userId: user.id }).exec();
+        return search(model.Location, words, { hostId: host._id });
+    }
+);
 const searchInspected = (_, { words }) => search(model.Location, words, { is_inspected: true });
 const searchUninspected = (_, { words }) => search(model.Location, words, { is_inspected: false });
 const searchDrafts = (_, { words }) => search(model.LocationDraft, words);
@@ -297,7 +303,7 @@ const inspectUpdation = isAdminResolver.createResolver(
         return updated;
     }
 );
-mutations = {...mutations, addLocation, inspect, undoInspection, updateLocation, inspectUpdation, deleteLocation, deleleAllLocations, searchInspected, searchUninspected, searchDrafts };
+mutations = {...mutations, addLocation, inspect, undoInspection, updateLocation, inspectUpdation, deleteLocation, deleleAllLocations, searchInspected, searchUninspected, searchDrafts, searchByHost };
 //endregion
 
 exports.mutations = {

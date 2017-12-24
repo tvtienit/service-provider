@@ -12,6 +12,7 @@ exports.mutation = `
         deleteLocation(locationId: String!): Location,
         searchInspected(words: String!): [Location],
         searchUninspected(words: String!): [Location],
+        searchByHost(words: String!): [Location],
         deleleAllLocations: Location,
         searchCategories(words: String!): [Category],
         addLocation(location: LocationInput!): Location,
