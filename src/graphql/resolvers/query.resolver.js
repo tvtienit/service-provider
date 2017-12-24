@@ -33,7 +33,12 @@ queries = {...queries, users, firstByUsername, extract };
 //region category
 const categoriesByCity = async(_, { cgrId, city, page, limit }, context) => {
     const option = (cgrId) ? { _id: cgrId } : {};
-    return model.Category.find(option).exec();
+    const result = await model.Category.find(option).exec();
+    for (var i = 0; i < result.length; i++) {
+        result[i].locations = await locationsByCity(_, {cgrId: result[i]._id, city, page, limit});
+    }
+
+    return result;
 };
 
 const categories = (_, { page, limit }) => {
@@ -45,8 +50,12 @@ queries = {...queries, categoriesByCity, categories, categoryById };
 //endregion
 
 //region location
-const locationsByCity = async(_, { city, page, limit }) => {
-    return paginate(model.Location, { city: city, is_inspected: true }, page, limit);;
+const locationsByCity = async(_, { cgrId, city, page, limit }) => {
+    let options = { city: city, is_inspected: true };
+    if (cgrId) {
+        options = {...options, categoryId: cgrId};
+    }
+    return paginate(model.Location, options, page, limit);;
 };
 
 const locationsByHost = isAuthenticatedResolver.createResolver(

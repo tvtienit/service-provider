@@ -27,20 +27,7 @@ const filters = {
         }
     },
     Category: {
-        locations: (_, { city, page, limit }) => {
-            let options = {categoryId: _._id};
-            if (city) {
-                options = {...options, city: city, is_inspected: true};
-            }
-            
-            page = page ? page : 1;
-            limit = limit ? limit : 10;
-            return model.Location.paginate(options, {
-                page: page,
-                limit: limit,
-                sort: { created_at: -1 },
-            }).then(result => result.docs);
-        }
+        locations: (_) => _.locations ? _.locations : model.Location.find({ categoryId: _.id }).exec()
     },
     Host: {
         location: (_) => {
