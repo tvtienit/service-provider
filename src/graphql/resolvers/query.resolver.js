@@ -11,7 +11,10 @@ const paginate = (model, options, page, limit) => {
         page: page,
         limit: limit,
         sort: { created_at: -1 },
-    }).then(result => result.docs);
+    }).then(result => {
+        result.docs.push({pages: result.pages});
+        return result.docs;
+    });
 }
 
 //region user

@@ -26,7 +26,8 @@ const rootType = `
         registration_date: String,
         registered: Host,
         reviews: [Review],
-        subLocations: [Location]
+        subLocations: [Location],
+        pages: Int
     }
 
     type Host {
@@ -35,14 +36,16 @@ const rootType = `
         host_title: String,
         phone: String,
         head_office: String,
-        location: [Location]
+        location: [Location],
+        pages: Int
     }
 
     type Category {
         _id: ID,
         title: String,
         description: String,
-        locations: [Location]
+        locations: [Location],
+        pages: Int
     }
 
     type Review {
@@ -51,7 +54,8 @@ const rootType = `
         location: Location,
         stars: Int,
         content: String,
-        date: String
+        date: String,
+        pages: Int
     }
 
     type Location implements ILocation {
@@ -68,7 +72,8 @@ const rootType = `
         is_inspected: Boolean
         host: Host,
         reviews: [Review],
-        subscribers: [User]
+        subscribers: [User], 
+        pages: Int
     }
 
     # Describe the draft version of a location that've edited by its own hoster
@@ -83,8 +88,9 @@ const rootType = `
         lat: Float,
         long: Float,
         price: Float,
-        is_inspected: Boolean
-        realId: String
+        is_inspected: Boolean,
+        realId: String,
+        pages: Int
     }
 `;
 
