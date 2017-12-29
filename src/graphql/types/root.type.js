@@ -13,8 +13,17 @@ const rootType = `
 
     type Subscriber {
         _id: ID,
-        userId: String,
-        locationId: String,
+        user: User,
+        location: Location,
+        notifications: [Notification]
+    }
+
+    type Notification {
+        _id: ID,
+        subscriber: Subscriber,
+        status: Boolean,
+        message: String,
+        date: String,
     }
 
     type User {

@@ -24,7 +24,7 @@ const filters = {
             });
 
             return subLocs;
-        }
+        },
     },
     Category: {
         locations: (_) => _.locations ? _.locations : model.Location.find({ categoryId: _.id }).exec()
@@ -66,6 +66,19 @@ const filters = {
 
             return subUsers;
         }
+    },
+    Subscriber: {
+        user: (_) => model.User.findOne({ _id: _.userId }).exec(),
+        location: (_) => model.Location.findOne({ _id: _.locationId }).exec(),
+        notifications: (_) => model.Notification.find({ subId: _._id }).exec()
+    },
+    Notification: {
+        date: (_) => (
+            _.createdAt.toISOString()
+            .replace(/T/, ' ')
+            .replace(/\..+/, '')
+        ),
+        subscriber: (_) => model.Subscriber.findOne({ _id: _.subId }).exec()
     }
 };
 

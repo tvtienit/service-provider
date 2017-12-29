@@ -1,5 +1,5 @@
 exports.subscription = `
     type Subscription {
-        requestService: Subscriber
+        requestService(token: String): Notification
     }
 `;

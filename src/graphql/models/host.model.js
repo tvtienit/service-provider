@@ -20,7 +20,7 @@ const hostSchema = new Schema({
 }, { collection: 'host', timestamps: true });
 
 hostSchema.plugin(mongoosePaginate);
-hostSchema.index({ phone: 'text', host_title: 'text', head_office: 'text' });
+hostSchema.index({ phone: 'text'});
 const mHost = mongoose.model('host', hostSchema);
 
 exports.Host = mHost;

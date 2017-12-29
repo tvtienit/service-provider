@@ -24,6 +24,7 @@ exports.mutation = `
         searchDrafts(words: String!): [LocationDraft],
         inspectUpdation(draftId: String): Location,
         profile: User,
-        users(page: Int, limit: Int): [User]
+        users(page: Int, limit: Int): [User],
+        readNotification(notificationId: String!): Notification
     }
 `;

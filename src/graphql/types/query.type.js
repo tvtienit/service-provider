@@ -11,6 +11,7 @@ exports.query = `
         locationsByCity(cgrId: String, city: String!, page: Int, limit: Int): [Location],
         inspectedLocations(page: Int, limit: Int): [Location],
         unInspectedLocations(page: Int, limit: Int): [Location],
-        locationDrafts(page: Int, limit: Int): [LocationDraft]
+        locationDrafts(page: Int, limit: Int): [LocationDraft],
+        unreadNotifications: [Notification]
     }
 `;

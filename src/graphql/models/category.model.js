@@ -14,7 +14,6 @@ const categorySchema = new Schema({
 }, { collection: 'category', timestamps: true });
 
 categorySchema.plugin(mongoosePaginate);
-categorySchema.index({ title: 'text', description: 'text' });
 const mCategory = mongoose.model('category', categorySchema);
 
 exports.Category = mCategory;

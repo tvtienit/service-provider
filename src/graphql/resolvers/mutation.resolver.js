@@ -39,6 +39,7 @@ const registerHost = (userId) => {
 
 const subscribes = isAuthenticatedResolver.createResolver(
     async(_, params, { user }) => {
+        const fullInformationUser = await profile(_, {}, { user });
         const eSub = await model.Subscriber.findOne({ userId: user.id, locationId: params.locationId }).exec();
         const eLoc = await model.Location.findOne({ _id: params.locationId }).exec();
         const eHost = await model.Host.findOne({ _id: eLoc.hostId }).exec();
@@ -47,13 +48,22 @@ const subscribes = isAuthenticatedResolver.createResolver(
         } else if (eHost.userId === user.id) {
             throw new Error("Cannot subscribe location that you're hosting");
         } else {
-            const nSub = await model.Subscriber.create({
+            const message = fullInformationUser.username + " has subscribed your " + eLoc.title;
+            const status = false;
+            let notifObject = { message, status };
+            return model.Subscriber.create({
                 userId: user.id,
                 locationId: params.locationId
-            });
-
-            pubsub.publish(REQUEST_SERVICE, { requestService: nSub });
-            return nSub;
+            })
+            .then(nSub => {
+                notifObject = { ...notifObject, subId: nSub._id };
+                return model.Notification.create(notifObject).then(
+                    nNotif => {
+                        pubsub.publish(REQUEST_SERVICE, { requestService: nNotif });
+                        return nSub;
+                    });
+            })
+            .catch(err => { throw err });
         }
     }
 );
@@ -306,6 +316,14 @@ const inspectUpdation = isAdminResolver.createResolver(
 mutations = {...mutations, addLocation, inspect, undoInspection, updateLocation, inspectUpdation, deleteLocation, deleleAllLocations, searchInspected, searchUninspected, searchDrafts, searchByHost };
 //endregion
 
+//region notification
+const readNotification = isAuthenticatedResolver.createResolver(
+    (_, { notificationId }, { user }) => {
+        return model.Notification.findByIdAndUpdate(notificationId, { status: true }, { new: true }).exec();
+    }
+);
+mutations = {...mutations, readNotification};
+//endregion
 exports.mutations = {
     Mutation: {...mutations }
 }

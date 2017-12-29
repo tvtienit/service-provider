@@ -89,6 +89,22 @@ const locationDrafts = (_, { page, limit }) => {
 queries = {...queries, locationsByCity, inspectedLocations, unInspectedLocations, locationDrafts, locationById, locationsByHost };
 //endregion
 
+//region notification
+const unreadNotifications = isAuthenticatedResolver.createResolver(
+    async(_, params, { user }) => {
+        const host = await model.Host.findOne({ userId: user.id }).exec(); 
+        const locations = await model.Location.find({ hostId: host._id }).exec();
+        return model.Subscriber
+                    .find({ locationId: { $in : locations.map(loc => loc._id) } })
+                    .exec()
+                    .then((subIds) => {
+                        return model.Notification.find({ subId: { $in: subIds.map(_=>_.id) }, status: false }).exec();
+                    }).catch(err => { throw err });
+    }
+);
+queries = {...queries, unreadNotifications};
+//endregion
+
 exports.queries = {
     Query: {...queries }
 };
