@@ -40,30 +40,32 @@ const registerHost = (userId) => {
 const subscribes = isAuthenticatedResolver.createResolver(
     async(_, params, { user }) => {
         const fullInformationUser = await profile(_, {}, { user });
-        const eSub = await model.Subscriber.findOne({ userId: user.id, locationId: params.locationId }).exec();
+        //const eSub = await model.Subscriber.findOne({ userId: user.id, locationId: params.locationId }).exec();
         const eLoc = await model.Location.findOne({ _id: params.locationId }).exec();
         const eHost = await model.Host.findOne({ _id: eLoc.hostId }).exec();
-        if (eSub) {
-            throw new Error("You've subscribed this location before");
-        } else if (eHost.userId === user.id) {
-            throw new Error("Cannot subscribe location that you're hosting");
+
+        if (eHost.userId === user.id) {
+            throw new Error("Cannot request for a call to location that you're hosting");
         } else {
-            const message = fullInformationUser.username + " has subscribed your " + eLoc.title;
+            const message = fullInformationUser.username + " has asked you to call back to your " + eLoc.title + 
+                            " by <span style=\"color:green\">" + fullInformationUser.phone + "</span>";
             const status = false;
             let notifObject = { message, status };
-            return model.Subscriber.create({
-                userId: user.id,
-                locationId: params.locationId
-            })
-            .then(nSub => {
-                notifObject = { ...notifObject, subId: nSub._id };
-                return model.Notification.create(notifObject).then(
-                    nNotif => {
-                        pubsub.publish(REQUEST_SERVICE, { requestService: nNotif });
-                        return nSub;
-                    });
-            })
-            .catch(err => { throw err });
+            let query   =   { userId: user.id, locationId: params.locationId },
+                options =   { upsert: true, new: true, setDefaultsOnInsert: true },
+                update  =   { ...query };
+            
+            return model.Subscriber
+                        .findOneAndUpdate(query, update, options)
+                        .then(nSub => {
+                            notifObject = { ...notifObject, subId: nSub._id };
+                            return model.Notification.create(notifObject).then(
+                                nNotif => {
+                                    pubsub.publish(REQUEST_SERVICE, { requestService: nNotif });
+                                    return nSub;
+                                });
+                        })
+                        .catch(err => { throw err });      
         }
     }
 );
