@@ -287,6 +287,11 @@ const searchByHost = isAuthenticatedResolver.createResolver(
 const searchInspected = (_, { words }) => search(model.Location, words, { is_inspected: true });
 const searchUninspected = (_, { words }) => search(model.Location, words, { is_inspected: false });
 const searchDrafts = (_, { words }) => search(model.LocationDraft, words);
+const searchAll = async(_, { words }) => {
+    const inspected = await searchInspected(_, { words });
+    const uninspected = await searchUninspected(_, { words });
+    return lds.concat(inspected, uninspected);
+}
 
 const undoInspection = isAdminResolver.createResolver(
     (_, { locationId }, context) => {
@@ -315,7 +320,7 @@ const inspectUpdation = isAdminResolver.createResolver(
         return updated;
     }
 );
-mutations = {...mutations, addLocation, inspect, undoInspection, updateLocation, inspectUpdation, deleteLocation, deleleAllLocations, searchInspected, searchUninspected, searchDrafts, searchByHost };
+mutations = {...mutations, searchAll, addLocation, inspect, undoInspection, updateLocation, inspectUpdation, deleteLocation, deleleAllLocations, searchInspected, searchUninspected, searchDrafts, searchByHost };
 //endregion
 
 //region notification
